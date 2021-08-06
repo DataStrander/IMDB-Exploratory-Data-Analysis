@@ -5,4 +5,4 @@ As deep lover of movies since their very beginning, I want to understand which t
 
 ## Data Source
 
-The IMDB website helps us a lot in this regard and all the .csv used in this analysis can be found here legally at no cost
+The IMDB website helps us a lot in this regard and all the .csv used in this analysis can be found [here](https://github.com/DataStrander/Spotify-Reccomendation-System/issues) legally at no cost
