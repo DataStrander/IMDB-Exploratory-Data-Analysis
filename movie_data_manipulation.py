@@ -52,9 +52,9 @@ for i in range(len(list_of_names)):
 
 # We can explore our list while selectig the index item of the latter to explore each sngle Dataframe
 # +
-'''Dataframes'''
+'''Master Frame Creation'''
 
-# It is time to see how we can join all this informtaion into a big dataframe
+# It is time to see how we can join all this information into a big dataframe
 # Let's start with the two df containing the titles info
 title_df = dataframes_list[1].merge(dataframes_list[5], on='tconst', how='left')
 # We need to merge dataframes_list[0] that contains the movie director name while splittin
@@ -64,6 +64,7 @@ series_df = dataframes_list[4].merge(dataframes_list[3], on='tconst', how='left'
 # -
 
 
+'''Sorting Dataframes'''
 
 
 
