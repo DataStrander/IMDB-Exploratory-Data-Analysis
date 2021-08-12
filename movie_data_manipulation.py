@@ -16,8 +16,6 @@ import gzip
 import shutil
 import os
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as pt
 
 # +
 '''Zipping TSV Loading'''
@@ -54,17 +52,26 @@ for i in range(len(list_of_names)):
 # +
 '''Master Frame Creation'''
 
-# It is time to see how we can join all this information into a big dataframe
-# Let's start with the two df containing the titles info
+# It is time to see how we can join all this information into a big dataframe. Let's start with the two df containing the titles info
 title_df = dataframes_list[1].merge(dataframes_list[5], on='tconst', how='left')
 # We need to merge dataframes_list[0] that contains the movie director name while splittin
 director_df = name_basics.merge(dataframes_list[2], on='directors', how='left')
 # At last, we have the two df with info regarding tv series
 series_df = dataframes_list[4].merge(dataframes_list[3], on='tconst', how='left')
+
+
+# +
+'''Sorting Dataframes'''
+
+imdb = title_df.merge(director_df, on='tconst', how='left')
+# full_imdb = imdb.merge(series_df, on='tconst', how='left')
 # -
 
+imdb.to_csv('imdb_df.csv')
 
-'''Sorting Dataframes'''
+
+
+
 
 
 
