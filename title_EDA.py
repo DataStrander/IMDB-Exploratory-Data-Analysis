@@ -21,8 +21,10 @@ import matplotlib.pyplot as pt
 imdb = pd.read_csv('imdb_df.csv')
 
 imdb.isnull().sum(axis = 0)
+
 imdb.head()
 
-imdb.describe()
+imdb = imdb.drop(columns=['primaryTitle','Unnamed: 0','knownForTitles','directors','writers','isAdult','primaryProfession'])
+imdb = imdb.rename(columns={'titleType':'type','originalTitle','title',})
 
 
