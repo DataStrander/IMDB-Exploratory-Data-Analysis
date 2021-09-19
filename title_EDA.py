@@ -61,9 +61,29 @@ fig = px.bar(imdb, x = genres, y = ind, color = ind)
 fig.update_layout(title='Title Amount by Genre', xaxis_title='Movie Count', yaxis_title='Genres',
                  width=1000, height=400)
 fig.show()
+
+# +
+'''Director Box Plot'''
+
+director = imdb.groupby("director").mean()
+director = director[director['averageRating']>=8.0]
+
+# Boxplot to see the outlaier trend for each director
+fig = px.box(director, x=director.index, y="averageRating", # color="smoker",
+             notched=True, # used notched shape
+             title="Box plot of total bill",
+            # hover_data=["day"] # add day column to hover data
+            )
+fig.show()
 # -
-
-
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=imdb['averageRating'], y=imdb['startYear'], mode='markers', # size=len(imdb['type']),
+                         marker=dict(color='LightSkyBlue',size=120), line=dict(color='MediumPurple', width=12),
+                         # color=imdb['genres'], hover_name="type", size_max=60)
+                         showlegend=False)
+             )
+fig.update_layout(plot_bgcolor=imdb["genres"], paper_bgcolor=imdb["genres"], font_color=imdb["type"])
+fig.show()
 
 # +
 '''Genres Rating Cluster'''
@@ -76,11 +96,15 @@ g.legend(loc='upper right', bbox_to_anchor=(1.35, 1), prop={'size': 15})
 fig = plt.gcf()
 fig.set_size_inches(12, 8)
 # -
-
-fig = go.Figure(data=go.Scatter(x=imdb['averageRating'], y=imdb['startYear'], size=len(imdb['type']),
-                               color=imdb['genres'], hover_name="type", log_x=True, size_max=60))
-fig.update_layout(plot_bgcolor=imdb["genres"], paper_bgcolor=colors["genres"], font_color=colors["type"])
+fig = go.Figure()
+for contestant, group in imdb.groupby("Contestant"):
+    fig.add_trace(go.Bar(x=group["Fruit"], y=group["Number Eaten"], name=contestant))
+fig.update_layout(legend_title_text = "Best Movie Director by Film Rating")
+fig.update_xaxes(title_text="Director")
+fig.update_yaxes(title_text="Rating")
 fig.show()
+
+
 
 
 
