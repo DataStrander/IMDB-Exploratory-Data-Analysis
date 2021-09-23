@@ -30,6 +30,7 @@ imdb.isnull().sum(axis = 0)
 
 imdb = imdb.drop(columns=['primaryTitle','Unnamed: 0','knownForTitles','directors','writers','isAdult','primaryProfession'])
 imdb = imdb.rename(columns={'titleType':'type','originalTitle':'title','primaryName':'director'})
+imdb.dropna(how='any')
 imdb.head()
 
 # +
@@ -41,7 +42,7 @@ print(imdb['type'].unique(), imdb.info())
 # +
 '''Genre Analysis'''
 
-imdb_list = imdb['genres'].values.tolist()
+imdb_list = imdb['genres'].to_numpy().tolist()
 imdb[['main_genres']] = imdb['genres'].astype(str).str.split(",",expand=True,).get(0)
 # for i in range(imdb["genres"].str.split(",", n = 1, expand = True)): data["Name_{}".format()]= new[i]
 # for genre in imdb_list:
@@ -65,24 +66,27 @@ fig.show()
 # +
 '''Director Box Plot'''
 
-director = imdb.groupby("director").mean()
-director = director[director['averageRating']>=8.0]
+director = imdb.groupby("director")['type','averageRating','startYear'].mean()
+director = director.nlargest(8, 'averageRating')
 
 # Boxplot to see the outlaier trend for each director
-fig = px.box(director, x=director.index, y="averageRating", # color="smoker",
+fig = px.box(director, x=director.index, y="averageRating", color="averageRating",
              notched=True, # used notched shape
-             title="Box plot of total bill",
-            # hover_data=["day"] # add day column to hover data
+             hover_data=["averageRating"]
             )
+fig.update_layout(title='Most Appreciated Directors', title_font_family='Open Sans'
+                  xaxis_title='Director', yaxis_title='Best Rating', width=1000, height=400)
 fig.show()
-# -
+# +
+'''Movie Appreciation Time Series'''
+
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=imdb['averageRating'], y=imdb['startYear'], mode='markers', # size=len(imdb['type']),
                          marker=dict(color='LightSkyBlue',size=120), line=dict(color='MediumPurple', width=12),
                          # color=imdb['genres'], hover_name="type", size_max=60)
                          showlegend=False)
              )
-fig.update_layout(plot_bgcolor=imdb["genres"], paper_bgcolor=imdb["genres"], font_color=imdb["type"])
+fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color='rgba(0,0,0,0)')
 fig.show()
 
 # +
