@@ -18,6 +18,9 @@ import warnings
 import pandas as pd
 from pandas.io.formats import style
 import numpy as np
+import nltk
+from nltk.corpus import names
+from nltk import NaiveBayesClassifier
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly
@@ -108,7 +111,66 @@ fig.update_xaxes(title_text="Director")
 fig.update_yaxes(title_text="Rating")
 fig.show()
 
+# +
+'''Native Bayes Classifier for Character Classification'''
 
+# Let's split the tile to have a list of it and perform a Dataframe construction on the two files
+titles = titles.split('\n')
+# Unfortunately \n is still remaining but we can easily remove it
+plots = plots.replace('\n', ' ')
+print(len(titles),len(plots))
+
+# Now it is time to wrap up the two files in an a cleaned dataframe in order to classify which titles have female protagonist
+df = pd.DataFrame({'title':titles, 'plot':plots})
+df['words'] = df['plot'].str.split().str.len()
+df['plot'] = df['plot'].astype(str)
+
+# It is also possible to compare the name inside each plots with a dataset of names and see how frequently the name is occurring in the plot
+web_names = pd.read_csv('https://query.data.world/s/wvx63qksvakxjpp4elvqwva45scuk3')
+web_names = web_names.rename(columns={'John':'name'})
+
+# Before diving inside the real NLP, we can simply see if there are any general gender proposition inside the text that are recurring the most 
+# i.e. she/he and her/him. In this way we would be able to find the main character following the common sense
+prop = {'male':[' he ',' his ',' him '],'female':[' she ',' her ']}
+male = [' he ',' his ',' him ']
+female = [' she ',' her ']
+words = lambda x: len(x["plot"].split(" ")) -1
+df['male'] = (df['plot'].str.count(' he ') + df['plot'].str.count(' his ') + df['plot'].str.count(' him '))
+df['female'] = (df['plot'].str.count(' she ') + df['plot'].str.count(' her '))
+
+# Let's also separate what we consider name from the starting words of each sentence
+def first_name(text):
+    result = re.findall('([A-Z]([a-z])+)', text)
+    return " ".join(map(str, result))
+df['characters']=df['plot'].apply(lambda x : first_name(x))
+
+# sum(df['male'] > df['female'] for df['female'] in len(df))
+print("The number of stories with a female protagonist is {}".format(len(df[df['female']>df['male']])))
+df
+
+'''NLTK Classifier -  Not Ultimated'''
+
+# According to an article, most of the female names end with specific letters and therefore we need to build a function that can recognise which letters
+# are most likely to belonging to names ending with them -> https://pubmed.ncbi.nlm.nih.gov/11026389/
+def gender_features(word):
+    return {'last_letter':word[-1]}
+
+# It comes in our help the nltk library with a dataset of all the names available that we can compare with the ones available in the plot
+gender_names = ([(name, 'male') for name in names.words('male.txt')]+ [(name, 'female') for name in names.words('female.txt')])
+random.shuffle(gender_names)
+  
+# List comprehension to extract and process the right features for our Gender Classifier
+featuresets = [(gender_features(n), gender) for (n, gender)in gender_names]
+
+# Training and Test Sets Prep
+train_set, test_set = featuresets[500:], featuresets[:500]
+  
+# The training set is used to train our Naive Bayes Classifier
+classifier = nltk.NaiveBayesClassifier.train(train_set)
+print(classifier.classify(gender_features('Olivia')))
+# Accuracy of Classifier on Train Set
+print(nltk.classify.accuracy(classifier, train_set))
+# -
 
 
 
